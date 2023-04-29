@@ -1,0 +1,46 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Welcome to Crypt!</title>
+    <style>
+      h1 {
+        font-family: Arial, sans-serif;
+        font-size: 36px;
+        color: #333;
+        text-align: center;
+      }
+      p {
+        font-family: Arial, sans-serif;
+        font-size: 18px;
+        color: #666;
+        text-align: center;
+      }
+      button {
+        background-color: #007bff;
+        border: none;
+        color: #fff;
+        padding: 12px 24px;
+        font-size: 16px;
+        border-radius: 5px;
+        cursor: pointer;
+        display: block;
+        margin: 0 auto;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Welcome to Crypt!</h1>
+    <p>Click the button to generate session</p>
+    <button onclick=createSession()>Generate</button>
+    <p>You get 2 minutes to enter the text to encrypt</p>
+    <script>
+        function createSession() 
+    {window.location.href = "/generate";} 
+    </script>
+  </body>
+
+</html>
