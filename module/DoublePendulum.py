@@ -7,14 +7,14 @@ from scipy.integrate import odeint
 
 
 # intially passsing both angles theta_1_initial,theta_2_initial and both angular velocities w1 and w2
-def getCoordinates(total_time: float = 40, total_samples=1001, theta1_initial=1, angularVelocity_initial_1=-3, theta2_intial=-1, angularVelocity_initial_2=5, mass1=2, mass2=1, length_1=2, length_2=1, gravity=9.81):
+def getCoordinates(total_time: float=40, total_samples:int=1001, theta1_initial:float=1, angularVelocity_initial_1:float=-3, theta2_intial:float=-1, angularVelocity_initial_2:float=5, mass1:float=2, mass2:float=1, length_1:float=2, length_2:float=1, gravity:float=9.81):
     t, g = smp.symbols('t g')
     m1, m2 = smp.symbols('m1 m2')
     L1, L2 = smp.symbols('L1, L2')
 
     # theta_1 and theta_2 are functions of time (which we will eventually solve for). We need to define them carefully.
 
-    the1, the2 = smp.symbols(r'\theta_1, \theta_2', cls=smp.Function)
+    the1, the2 = smp.symbols(r'\theta_1, \theta_2', cls=smp.Function) # type: ignore
 
     # Explicitly write them as functions of time $t$:
 
@@ -50,8 +50,8 @@ def getCoordinates(total_time: float = 40, total_samples=1001, theta1_initial=1,
 
     """Get Lagrange's equations
 
-    $$\frac{\partial L}{\partial \theta_1} - \frac{d}{dt}\frac{\partial L}{\partial \dot{\theta_1}} = 0$$
-    $$\frac{\partial L}{\partial \theta_2} - \frac{d}{dt}\frac{\partial L}{\partial \dot{\theta_2}} = 0$$
+    $$\frac{partial L}{partial theta_1} - \frac{d}{dt}\frac{partial L}{partial dot{theta_1}} = 0$$
+    $$\frac{partial L}{partial theta_2} - \frac{d}{dt}\frac{partial L}{partial dot{theta_2}} = 0$$
     """
 
     LE1 = smp.diff(L, the1) - smp.diff(smp.diff(L, the1_d), t).simplify()

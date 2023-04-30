@@ -1,9 +1,11 @@
 node_modules
 .venv
 __pycache__
+.vscode
 
 Keys
-Encryted
+Encrypted
+Decrypted
 
 *.jpg
 *.png

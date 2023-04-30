@@ -48,8 +48,7 @@ def sizeToByte(size: tuple[int, int]) -> bytes:
     height, width = size
     height1, height2 = height // 256, height % 256
     width1, width2 = width // 256, width % 256
-    size = bytes([height1, height2, width1, width2])
-    return size
+    return bytes([height1, height2, width1, width2])
 
 
 def byteToSize(size: bytes) -> tuple[int, int]:
@@ -59,45 +58,50 @@ def byteToSize(size: bytes) -> tuple[int, int]:
     return height, width
 
 
-def imageToBytes(filepath: str = None, img: Image.Image = None) -> bytes:
+def imageToBytes(filepath: str|None = None, img: Image.Image|None = None) -> bytes:
     """converts image to bytes sequence
 
     Args:
         filepath (str): path of the image to convert
 
     Returns:
-        bytes: image bytes prepended with image mode (8 Bytes) prepended with image size (4 bytes)
+        bytes: image bytes prepended image extension (6 bytes) prepended with image mode (8 Bytes) prepended with image size (4 bytes)
     """
     if filepath:
         img = Image.open(filepath)
     elif not img:
         raise ValueError("Must provide either filepath or img")
 
+    print(img.size, img.mode, filepath.rsplit('.', 1)[-1])
+    ext = __addPadding(bytes(filepath.rsplit('.', 1)[-1], 'utf-8'), 6)
     size = sizeToByte(img.size)
     mode = __addPadding(bytes(img.mode, 'utf-8'), 8)
-    return size + mode + img.tobytes()
+    
+    return size + mode + ext + img.tobytes()
 
 
-def bytesToImage(imgData: bytes, filepath: str = None) -> Image.Image | None:
-    """converts the given byte data to image by splitting it into mode, size, and image data
+def bytesToImage(imgData: bytes, imageDir: str) -> str:
+    """converts the given byte data to image by splitting it into mode, size, extension and image data
 
     Args:
-        imgData (bytes): bytes containing size, mode, and data
-        filepath (str, optional): path to store the image if itended to. Defaults to None.
+        imgData (bytes): bytes containing size, mode, extension and data
+        imageDir (str): directory path to store the  image in
 
     Returns:
-        Image.Image | None: return pillow image if filepath is not provided
+        str : returns the relative path of the stored decrypted image
     """
-    size, mode, img_bytes = imgData[0:4], imgData[4:12], imgData[12:]
+    size, mode, ext, img_bytes = imgData[0:4], imgData[4:12], imgData[12:18], imgData[18:]
 
     size = byteToSize(size)
-    mode = __removePadding(mode).__str__()
+    mode = str(__removePadding(mode), "utf-8")
+    ext = str(__removePadding(ext), "utf-8")
+    print(size, mode, ext)
     img = Image.frombytes(mode=mode, size=size, data=img_bytes)
-
-    if not filepath:
-        return img
-
+    
+    filepath = f"{imageDir}/{datetime.now().timestamp()}.png" 
+    # filepath = f"{imageDir}/{datetime.now().timestamp()}.{ext}" 
     img.save(filepath)
+    return filepath
 
 
 # total_time: float = 40
@@ -118,7 +122,7 @@ def writeKey(keyFileName, total_time, total_samples, theta1_intial, angularVeloc
             theta2_intial, angularVelocity_initial_2, mass1, mass2, length1, length2, gravity
         ] ))
     with open(keyFileName, "w") as keyFile:
-        keyFile.writelines(lines)
+        keyFile.write("\n".join(lines))
         keyFile.close()
 
 
@@ -130,4 +134,6 @@ def readKey(keyFileName: str):
 if __name__ == "__main__":
     # print(generateInitialConditions())
     # print(byteToSize(sizeToByte([252, 842])))
-    pass
+    
+    total_time, theta1_initial, theta2_intial, angularVelocity_initial_1, angular_velocity_initial_2, mass1, mass2, length_1, length_2, gravity = generateInitialConditions()
+    writeKey()

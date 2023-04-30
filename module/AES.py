@@ -87,15 +87,7 @@ def masterKey(
 
     # concatenating all the bytes into a 256-bit long key
     key = bytes()
-
-    for b in x1_new:
-        key += b
-    for b in y1_new:
-        key += b
-    for b in x2_new:
-        key += b
-    for b in y2_new:
-        key += b
+    key += b''.join(x1_new) + b''.join(y1_new) + b''.join(x2_new) + b''.join(y2_new)
 
     return key
 
