@@ -5,8 +5,6 @@ from Crypto.Cipher import AES
 from PIL import Image, UnidentifiedImageError
 from math import sqrt, floor
 
-from DoublePendulum import getCoordinates
-
 class InsufficientSamplesException(Exception):
     """Custom Exception that can be called when the samples of provided variable are not enough to perform the required task
 
@@ -115,6 +113,9 @@ def encrypt(msg: bytes, masterKey: bytes) -> tuple[bytes, bytes]:
     """
     cipher = AES.new(key=masterKey, mode=AES.MODE_CBC)
     cipherMsg = cipher.encrypt(__addPadding(msg, AES.block_size))
+    print(f"AES.block_size: {AES.block_size}")
+    print(f"message len: {len(msg)}")
+    print(f"cipher length: {len(cipherMsg)}")
     return cipher.iv, cipherMsg
 
 
@@ -134,9 +135,9 @@ def decrypt(cipherMsg: bytes, masterKey: bytes, initial_vector: bytes) -> bytes:
     return msg
 
 
-def encryptToImage(msg: bytes, masterKey: bytes, filename: str) -> bytes:
+def encryptToImage(msg: bytes, masterKey: bytes, filename: str) -> None:
     initial_vector, cipherMsg = encrypt(msg, masterKey)
-    
+    cipherMsg = initial_vector + cipherMsg
     totPixels = len(cipherMsg)
     height = floor(sqrt(totPixels))
     
@@ -146,14 +147,13 @@ def encryptToImage(msg: bytes, masterKey: bytes, filename: str) -> bytes:
     
     img = Image.frombytes(mode="L", size=(totPixels//height, height), data=cipherMsg)
     img.save(filename)
-        
-    return initial_vector
 
 
-def decryptFromImage(filename: str, masterKey: bytes, initial_vector: bytes) -> bytes:
+def decryptFromImage(filename: str, masterKey: bytes) -> bytes:
     img = Image.open(filename)
-    
     cipherMsg = bytes(img.getdata())
+        
+    initial_vector, cipherMsg = cipherMsg[0:16], cipherMsg[16:]
         
     return decrypt(cipherMsg, masterKey, initial_vector)
 
@@ -166,10 +166,11 @@ def imageToBytes(filepath):
 
 
 def __main():
-    x1, x2, y1, y2 = getCoordinates(total_samples=4)
-    key = masterKey(x1,x2,y1,y2, )
-    x1, x2, y1, y2 = getCoordinates(total_samples=4, length_1=2.0000000000000001)
-    key1 = masterKey(x1,x2,y1,y2)
+    # x1, x2, y1, y2 = getCoordinates(total_samples=4)
+    # key = masterKey(x1,x2,y1,y2, )
+    # x1, x2, y1, y2 = getCoordinates(total_samples=4, length_1=2.0000000000000001)
+    # key1 = masterKey(x1,x2,y1,y2)
+    key = masterKey([0,1,2,3],[0,1,2,3],[0,1,2,3],[0,1,2,3])
 
     print(f"master key length: {len(key)}")
 
@@ -182,9 +183,11 @@ def __main():
         mode = img.mode
         
     print(f"testing on message of length {len(msg)}")
-    iv = encryptToImage(msg, key, "text.png")
-    plain = decryptFromImage("text.png", key1, iv)
-    
+    encryptToImage(msg, key, "text.png")
+    plain = decryptFromImage("text.png", key)
+    print(mode.__sizeof__())
+    print(len(bytes(mode, 'utf-8')))
+    size = img.size[0].to_bytes() + img.size[1].to_bytes()
     
     img = Image.frombytes(mode=mode, size=img.size, data=plain)
     img.save("decrypted.png")

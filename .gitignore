@@ -1,6 +1,11 @@
+node_modules
+.venv
 __pycache__
+
+Keys
+Encryted
+
 *.jpg
 *.png
 *.txt
 *.bin
-node_modules
