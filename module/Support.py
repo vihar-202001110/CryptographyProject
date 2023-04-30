@@ -72,7 +72,6 @@ def imageToBytes(filepath: str|None = None, img: Image.Image|None = None) -> byt
     elif not img:
         raise ValueError("Must provide either filepath or img")
 
-    print(img.size, img.mode, filepath.rsplit('.', 1)[-1])
     ext = __addPadding(bytes(filepath.rsplit('.', 1)[-1], 'utf-8'), 6)
     size = sizeToByte(img.size)
     mode = __addPadding(bytes(img.mode, 'utf-8'), 8)
@@ -95,7 +94,7 @@ def bytesToImage(imgData: bytes, imageDir: str) -> str:
     size = byteToSize(size)
     mode = str(__removePadding(mode), "utf-8")
     ext = str(__removePadding(ext), "utf-8")
-    print(size, mode, ext)
+    
     img = Image.frombytes(mode=mode, size=size, data=img_bytes)
     
     filepath = f"{imageDir}/{datetime.now().timestamp()}.png" 

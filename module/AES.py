@@ -105,9 +105,6 @@ def encrypt(msg: bytes, masterKey: bytes) -> tuple[bytes, bytes]:
     """
     cipher = AES.new(key=masterKey, mode=AES.MODE_CBC)
     cipherMsg = cipher.encrypt(__addPadding(msg, AES.block_size))
-    print(f"AES.block_size: {AES.block_size}")
-    print(f"message len: {len(msg)}")
-    print(f"cipher length: {len(cipherMsg)}")
     return cipher.iv, cipherMsg
 
 
